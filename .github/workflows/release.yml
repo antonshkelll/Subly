@@ -1,10 +1,16 @@
 name: Release
 
-# Тег vX.Y.Z → GitHub Release с APK и jar-файлом сервера.
-# Ссылки вида releases/latest/download/subly.apk работают всегда на последнюю версию.
+# GitHub Release с APK и jar-файлом сервера.
+# Запуск: Actions → Release → Run workflow → версия (например, 1.0.1) — тег vX.Y.Z создастся сам.
+# Или push тега vX.Y.Z. Ссылки releases/latest/download/subly.apk всегда ведут на последнюю версию.
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Версия без v, например 1.0.1"
+        required: true
 
 permissions:
   contents: write
@@ -30,6 +36,9 @@ jobs:
           cp server/build/libs/subly-server.jar subly-server.jar
       - uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && format('v{0}', inputs.version) || github.ref_name }}
+          name: Subly ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+          target_commitish: ${{ github.sha }}
           files: |
             subly.apk
             subly-server.jar
