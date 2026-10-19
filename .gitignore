@@ -1,0 +1,15 @@
+# Gradle / IDE
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+local.properties
+.idea/
+*.iml
+.kotlin/
+captures/
+.DS_Store
+
+# Локальная база сервера и секреты
+server/data/
+deploy/.env
+*.env.local
