@@ -45,3 +45,14 @@ class ScheduleTest {
         assertEquals("через 5 дней", whenText(5))
     }
 }
+
+class SavingTest {
+    @Test fun sameSubscriptionIsNotCountedTwice() {
+        val list = listOf(
+            ru.antonshkel.subly.data.Insight("trial", "", "", 3588_00, listOf(2)),
+            ru.antonshkel.subly.data.Insight("duplicate", "", "", 3588_00, listOf(1, 2)),
+            ru.antonshkel.subly.data.Insight("duplicate", "", "", 1200_00, listOf(5, 6)),
+        )
+        assertEquals(4788_00L, ru.antonshkel.subly.ui.screens.potentialSaving(list))
+    }
+}
