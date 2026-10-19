@@ -30,7 +30,7 @@ import java.time.LocalDate
 
 /**
  * Скриншоты для README. Рендерятся без эмулятора (Robolectric + Roborazzi):
- *   ./gradlew recordRoborazziDebug  →  docs/screenshots/*.png
+ *   ./gradlew recordRoborazziDebug  →  папка docs/screenshots
  * В обычном прогоне тестов просто проверяют, что экраны рисуются без падений.
  */
 @RunWith(RobolectricTestRunner::class)
@@ -58,7 +58,7 @@ class ScreenshotTest {
     private val free = User(1, "anton@antonshkel.ru", "free", subscriptionLimit = 5)
 
     private val insights = listOf(
-        Insight("total", "106 818 ₽ в год", "Столько стоят ваши 7 подписок. Это 292 ₽ каждый день."),
+        Insight("total", "86 534 ₽ в год", "Столько стоят ваши 7 подписок. Это 237 ₽ каждый день."),
         Insight("trial", "Пробный период «Кинопоиск» скоро закончится", "Через 3 дня (22.10) начнут списывать 299 ₽. Если сервис не нужен, отмените подписку заранее.", 3588_00),
         Insight("duplicate", "2 сервиса в категории «Видео»", "Яндекс Плюс, Кинопоиск. Если оставить один, сэкономите от 3 588 ₽ в год.", 3588_00),
         Insight("upcoming", "За 7 дней спишется 947 ₽", "Яндекс Плюс — 20.10, Кинопоиск — 22.10, VK Музыка — 25.10."),

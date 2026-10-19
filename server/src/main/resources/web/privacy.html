@@ -1,1 +1,59 @@
-{{PUBLIC_URL}}
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Политика конфиденциальности · Subly</title>
+<meta name="description" content="Какие данные собирает Subly, зачем и как их удалить.">
+<link rel="canonical" href="{{PUBLIC_URL}}/privacy">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<style>
+  :root { --bg: #fff; --ink: #1d1d1f; --muted: #6e6e73; --accent: #0071e3; --line: #e5e5ea; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #000; --ink: #f5f5f7; --muted: #a1a1a6; --accent: #2997ff; --line: #2c2c2e; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+  main { max-width: 720px; margin: 0 auto; padding: 56px 22px 80px; }
+  h1 { font-size: 40px; letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 8px; }
+  h2 { font-size: 22px; margin: 36px 0 8px; }
+  p, li { color: var(--ink); } .muted { color: var(--muted); }
+  a { color: var(--accent); }
+  ul { padding-left: 22px; }
+</style>
+</head>
+<body>
+<main>
+  <p><a href="/">← Subly</a></p>
+  <h1>Политика конфиденциальности</h1>
+  <p class="muted">Действует с 19 октября 2026 года</p>
+
+  <p>Subly — трекер подписок. Здесь коротко и по делу написано, какие данные приложение хранит, зачем и как их удалить. Оператор данных — Антон Шкель, разработчик Subly.</p>
+
+  <h2>Что мы храним</h2>
+  <ul>
+    <li><b>Адрес почты</b> — чтобы вы могли войти в аккаунт с любого телефона.</li>
+    <li><b>Пароль</b> — только в виде хеша bcrypt. Сам пароль мы не знаем и восстановить не можем.</li>
+    <li><b>Список подписок</b>, который вы ввели: название, цена, период, дата списания, категория, заметка.</li>
+    <li><b>Платежи за Pro</b>: тариф, сумма, статус и идентификатор платежа в ЮKassa.</li>
+  </ul>
+
+  <h2>Чего мы не храним</h2>
+  <ul>
+    <li>Данные банковских карт: оплата проходит на стороне ЮKassa, Subly их не получает.</li>
+    <li>Доступ к банку, SMS, контактам и геолокации — приложение их не запрашивает.</li>
+    <li>Рекламные идентификаторы. В Subly нет рекламы и сторонней аналитики.</li>
+  </ul>
+
+  <h2>Зачем</h2>
+  <p>Данные используются только для работы приложения: показать ваши подписки, посчитать суммы, напомнить о списании и включить Pro после оплаты. Мы не продаём и не передаём их третьим лицам, кроме ЮKassa в момент оплаты.</p>
+
+  <h2>Где и сколько хранятся</h2>
+  <p>На сервере Subly, пока у вас есть аккаунт. Соединение с сервером шифруется (HTTPS). Напоминания считаются на телефоне по локальной копии списка.</p>
+
+  <h2>Как удалить данные</h2>
+  <p>В приложении: Профиль → «Удалить аккаунт». Почта, подписки и история платежей удаляются с сервера сразу и без возможности восстановления.</p>
+
+  <h2>Связаться</h2>
+  <p>Вопросы о данных: Telegram <a href="https://t.me/antonshkelll">@antonshkelll</a> или через сайт <a href="https://antonshkel.ru">antonshkel.ru</a>.</p>
+</main>
+</body>
+</html>

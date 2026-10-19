@@ -1,1 +1,300 @@
-{{PUBLIC_URL}}
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Subly — трекер подписок для Android</title>
+<meta name="description" content="Subly показывает, сколько уходит на подписки в месяц и в год, напоминает до списания и находит, где вы переплачиваете. Бесплатно для Android.">
+<link rel="canonical" href="{{PUBLIC_URL}}/">
+<meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:title" content="Subly — все подписки под контролем">
+<meta property="og:description" content="Сколько уходит на подписки, когда следующее списание и где можно сэкономить.">
+<meta property="og:url" content="{{PUBLIC_URL}}/">
+<meta property="og:image" content="{{PUBLIC_URL}}/static/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Subly","operatingSystem":"Android 7.0+",
+ "applicationCategory":"FinanceApplication","description":"Трекер подписок: сумма в месяц и в год, напоминания о списаниях, советы по экономии.",
+ "offers":[{"@type":"Offer","price":"0","priceCurrency":"RUB","name":"Free"},{"@type":"Offer","price":"149","priceCurrency":"RUB","name":"Pro, месяц"}],
+ "author":{"@type":"Person","name":"Антон Шкель","url":"https://antonshkel.ru"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+ {"@type":"Question","name":"Subly подключается к моему банку?","acceptedAnswer":{"@type":"Answer","text":"Нет. Подписки вы добавляете сами за несколько секунд. Subly не просит доступ к банку, картам или SMS."}},
+ {"@type":"Question","name":"Сколько стоит Subly?","acceptedAnswer":{"@type":"Answer","text":"До пяти подписок — бесплатно. Pro стоит 149 ₽ в месяц или 1 190 ₽ в год и снимает ограничения."}},
+ {"@type":"Question","name":"Pro продлевается автоматически?","acceptedAnswer":{"@type":"Answer","text":"Нет. Оплата разовая на месяц или год, продлить можно в любой момент вручную."}}
+]}
+</script>
+<style>
+  :root {
+    --bg: #f5f5f7; --bg2: #ffffff; --ink: #1d1d1f; --muted: #6e6e73; --line: #d2d2d7;
+    --accent: #0071e3; --accent-ink: #ffffff; --green: #248a3d; --card: #ffffff;
+    --grad: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #000; --bg2: #101012; --ink: #f5f5f7; --muted: #a1a1a6; --line: #333336;
+            --accent: #2997ff; --green: #30d158; --card: #1c1c1e; --grad: linear-gradient(135deg, #0a2a5c 0%, #1c1c1e 100%); }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font: 17px/1.47 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;
+         -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 22px; }
+
+  nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 82%, transparent);
+        backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid color-mix(in srgb, var(--line) 50%, transparent); }
+  nav .wrap { display: flex; align-items: center; height: 52px; gap: 28px; }
+  .logo { display: flex; align-items: center; gap: 9px; font-weight: 600; color: var(--ink); font-size: 19px; }
+  .logo:hover { text-decoration: none; }
+  .logo i { width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, #2e8bff, #0058d6); display: inline-block; position: relative; }
+  .logo i::after { content: ""; position: absolute; inset: 6px; border: 2.6px solid #fff; border-radius: 50%; border-left-color: transparent; }
+  nav .links { margin-left: auto; display: flex; gap: 24px; font-size: 13px; }
+  nav .links a { color: var(--ink); opacity: .8; }
+  @media (max-width: 600px) { nav .links a:not(.cta) { display: none; } }
+  .cta-small { background: var(--accent); color: var(--accent-ink) !important; padding: 5px 14px; border-radius: 980px; opacity: 1 !important; }
+
+  .hero { text-align: center; padding: 88px 0 40px; }
+  .eyebrow { color: var(--accent); font-weight: 600; font-size: 19px; }
+  h1 { font-size: clamp(44px, 8vw, 80px); line-height: 1.05; letter-spacing: -0.035em; font-weight: 700; margin-top: 10px; }
+  .lead { font-size: clamp(19px, 2.6vw, 24px); color: var(--muted); max-width: 680px; margin: 18px auto 0; line-height: 1.35; }
+  .buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 26px; border-radius: 980px; font-size: 17px; font-weight: 500; transition: transform .2s ease, opacity .2s; }
+  .btn:hover { text-decoration: none; transform: scale(1.03); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); }
+  .btn.ghost { color: var(--accent); border: 1px solid var(--accent); }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 14px; }
+
+  /* Телефон, собранный из HTML: ничего не грузим, на слабых устройствах — та же скорость */
+  .stage { display: flex; justify-content: center; padding: 30px 0 90px; perspective: 1400px; }
+  .phone { width: 300px; border-radius: 48px; padding: 12px; background: #1d1d1f; box-shadow: 0 40px 80px -30px rgba(0,0,0,.45);
+           transform: rotateX(8deg); transition: transform .8s cubic-bezier(.2,.8,.2,1); }
+  .stage.in .phone { transform: rotateX(0); }
+  .screen { border-radius: 38px; background: #f2f2f7; padding: 46px 14px 18px; color: #1d1d1f; overflow: hidden; height: 600px; }
+  .s-sub { font-size: 10px; color: #6e6e73; font-weight: 600; letter-spacing: .02em; }
+  .s-title { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; }
+  .s-hero { border-radius: 16px; padding: 14px; color: #fff; background: linear-gradient(135deg, #0a84ff, #5e5ce6); }
+  .s-hero small { opacity: .8; font-size: 11px; }
+  .s-hero b { display: block; font-size: 34px; letter-spacing: -0.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .s-stats { display: flex; gap: 16px; margin-top: 8px; font-size: 10px; opacity: .85; }
+  .s-stats span b { font-size: 13px; display: block; letter-spacing: 0; }
+  .s-card { background: #fff; border-radius: 16px; padding: 12px; margin-top: 10px; display: flex; align-items: center; gap: 14px; }
+  .donut { width: 78px; height: 78px; border-radius: 50%; flex: none;
+           background: conic-gradient(#30b0c7 0 48%, #34c759 0 75%, #ff3b30 0 84%, #8e8e93 0 93%, #af52de 0 97%, #007aff 0 100%);
+           -webkit-mask: radial-gradient(farthest-side, transparent 64%, #000 65%); mask: radial-gradient(farthest-side, transparent 64%, #000 65%); }
+  .legend { font-size: 11px; display: grid; gap: 4px; flex: 1; }
+  .legend i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; }
+  .s-h { font-size: 15px; font-weight: 600; margin: 14px 2px 6px; }
+  .row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: #fff; }
+  .row:first-of-type { border-radius: 14px 14px 0 0; } .row:last-child { border-radius: 0 0 14px 14px; }
+  .row + .row { border-top: .5px solid #e3e3e8; }
+  .av { width: 30px; height: 30px; border-radius: 8px; color: #fff; font-weight: 700; font-size: 13px; display: grid; place-items: center; }
+  .row .n { flex: 1; font-size: 13px; font-weight: 600; } .row .n small { display: block; font-weight: 400; color: #6e6e73; font-size: 10px; }
+  .row .p { font-size: 13px; font-weight: 600; }
+
+  section { padding: 90px 0; }
+  section.alt { background: var(--bg2); }
+  h2 { font-size: clamp(34px, 5.5vw, 56px); line-height: 1.07; letter-spacing: -0.03em; font-weight: 700; text-align: center; }
+  .sub { text-align: center; color: var(--muted); font-size: 21px; max-width: 640px; margin: 14px auto 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 18px; margin-top: 52px; }
+  .tile { background: var(--card); border-radius: 26px; padding: 30px; }
+  section.alt .tile { background: var(--bg); }
+  .tile .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 22px; margin-bottom: 18px; }
+  .tile h3 { font-size: 22px; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .tile p { color: var(--muted); font-size: 16px; }
+  .big { font-size: 52px; font-weight: 700; letter-spacing: -0.03em; margin-top: 12px; }
+
+  .steps { counter-reset: s; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px; margin-top: 52px; }
+  .step::before { counter-increment: s; content: counter(s); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+                  background: var(--accent); color: #fff; font-weight: 600; margin-bottom: 14px; }
+  .step h3 { font-size: 21px; margin-bottom: 6px; } .step p { color: var(--muted); }
+
+  .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-top: 52px; max-width: 760px; margin-left: auto; margin-right: auto; }
+  .plan { background: var(--card); border-radius: 26px; padding: 34px; }
+  .plan.pro { background: var(--grad); color: #fff; }
+  .plan.pro p, .plan.pro li { color: rgba(255,255,255,.85); }
+  .plan h3 { font-size: 24px; } .plan .price { font-size: 44px; font-weight: 700; letter-spacing: -0.03em; margin: 8px 0 4px; }
+  .plan p { color: var(--muted); font-size: 15px; }
+  .plan ul { list-style: none; margin-top: 20px; display: grid; gap: 10px; font-size: 16px; }
+  .plan li::before { content: "✓"; margin-right: 10px; font-weight: 700; }
+
+  .faq { max-width: 760px; margin: 48px auto 0; }
+  details { border-bottom: 1px solid var(--line); padding: 20px 0; }
+  summary { cursor: pointer; font-size: 19px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; }
+  summary::after { content: "+"; color: var(--accent); font-weight: 400; font-size: 24px; line-height: 1; transition: transform .25s; }
+  details[open] summary::after { transform: rotate(45deg); }
+  details p { color: var(--muted); margin-top: 10px; }
+
+  .final { text-align: center; }
+  footer { color: var(--muted); font-size: 12px; padding: 30px 0 50px; border-top: 1px solid var(--line); }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 18px; justify-content: space-between; }
+  footer a { color: var(--muted); }
+
+  /* Появление при прокрутке — только opacity/transform, это считает видеокарта */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.8,.2,1); }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .phone { opacity: 1 !important; transform: none !important; transition: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <div class="wrap">
+    <a class="logo" href="/"><i></i>Subly</a>
+    <div class="links">
+      <a href="#features">Возможности</a>
+      <a href="#how">Как это работает</a>
+      <a href="#pricing">Цены</a>
+      <a href="#faq">Вопросы</a>
+      <a class="cta cta-small" href="https://github.com/antonshkelll/subly/releases/latest/download/subly.apk">Скачать</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <div class="eyebrow">Трекер подписок для Android</div>
+  <h1>Все подписки.<br>Под контролем.</h1>
+  <p class="lead">Subly показывает, сколько уходит на сервисы в месяц и в год, напоминает о списаниях заранее и подсказывает, от чего можно отказаться.</p>
+  <div class="buttons">
+    <a class="btn primary" href="https://github.com/antonshkelll/subly/releases/latest/download/subly.apk">Скачать APK</a>
+    <a class="btn ghost" href="https://github.com/antonshkelll/subly">Исходный код</a>
+  </div>
+  <p class="meta">Бесплатно · Android 7.0 и новее · без рекламы</p>
+</header>
+
+<div class="stage reveal" id="stage">
+  <div class="phone" aria-hidden="true">
+    <div class="screen">
+      <div class="s-sub">ПОНЕДЕЛЬНИК, 19 ОКТЯБРЯ</div>
+      <div class="s-title">Обзор</div>
+      <div class="s-hero">
+        <small>В месяц</small>
+        <b id="counter">7 211 ₽</b>
+        <div class="s-stats"><span>В год<b>86 534 ₽</b></span><span>Подписок<b>7</b></span><span>За 30 дней<b>8 577 ₽</b></span></div>
+      </div>
+      <div class="s-card">
+        <div class="donut"></div>
+        <div class="legend">
+          <div><i style="background:#30b0c7"></i>Здоровье · 48%</div>
+          <div><i style="background:#34c759"></i>Программы · 27%</div>
+          <div><i style="background:#ff3b30"></i>Видео · 9%</div>
+          <div><i style="background:#8e8e93"></i>Связь · 9%</div>
+        </div>
+      </div>
+      <div class="s-h">Ближайшие 30 дней</div>
+      <div>
+        <div class="row"><div class="av" style="background:#ff9500">Я</div><div class="n">Яндекс Плюс<small>Завтра · 20 окт</small></div><div class="p">399 ₽</div></div>
+        <div class="row"><div class="av" style="background:#ff6a00">К</div><div class="n">Кинопоиск<small>Через 3 дня · 22 окт</small></div><div class="p">299 ₽</div></div>
+        <div class="row"><div class="av" style="background:#007aff">V</div><div class="n">VK Музыка<small>Через 6 дней · 25 окт</small></div><div class="p">249 ₽</div></div>
+        <div class="row"><div class="av" style="background:#8e8e93">М</div><div class="n">Мобильная связь<small>Через 9 дней · 28 окт</small></div><div class="p">650 ₽</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="alt" id="features">
+  <div class="wrap">
+    <h2 class="reveal">Видно всё. Сразу.</h2>
+    <p class="sub reveal">Средний человек платит за 5–10 сервисов и помнит про половину. Subly собирает их в одном месте.</p>
+    <div class="grid">
+      <div class="tile reveal"><div class="ic" style="background:#0071e31f">📊</div><h3>Сумма в месяц и в год</h3><p>Недельные, квартальные и годовые тарифы пересчитываются в месяц, чтобы их можно было сравнить.</p></div>
+      <div class="tile reveal"><div class="ic" style="background:#ff95001f">🔔</div><h3>Напоминания до списания</h3><p>За день-неделю до оплаты — уведомление. Работает без интернета: даты считаются на телефоне.</p></div>
+      <div class="tile reveal"><div class="ic" style="background:#34c7591f">💡</div><h3>Советы по экономии</h3><p>Два музыкальных сервиса, пробный период, который вот-вот станет платным, слишком дорогой тариф.</p></div>
+      <div class="tile reveal"><div class="ic" style="background:#af52de1f">🧾</div><h3>Без доступа к банку</h3><p>Никаких SMS, карт и банковских логинов. Только список подписок, который вы ведёте сами.</p></div>
+      <div class="tile reveal"><div class="ic" style="background:#ff3b301f">🌙</div><h3>Светлая и тёмная тема</h3><p>Чистый чёрный фон в тёмной теме экономит батарею на OLED-экранах.</p></div>
+      <div class="tile reveal"><div class="ic" style="background:#30b0c71f">⚡️</div><h3>Быстро на любом телефоне</h3><p>Открывается мгновенно даже без сети: данные хранятся в кеше, анимации не нагружают процессор.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <h2 class="reveal">Три минуты на старт.</h2>
+    <div class="steps">
+      <div class="step reveal"><h3>Добавьте подписки</h3><p>Выберите сервис из популярных или впишите свой, укажите цену и дату списания.</p></div>
+      <div class="step reveal"><h3>Получайте напоминания</h3><p>Subly предупредит до оплаты, а в день списания вы уже будете знать сумму.</p></div>
+      <div class="step reveal"><h3>Отмените лишнее</h3><p>Посмотрите советы и отключите то, чем не пользуетесь. Экономия видна сразу в рублях.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="pricing">
+  <div class="wrap">
+    <h2 class="reveal">Простые цены.</h2>
+    <p class="sub reveal">Без автопродления: платите, когда захотите продлить.</p>
+    <div class="plans">
+      <div class="plan reveal">
+        <h3>Free</h3><div class="price">0 ₽</div><p>навсегда</p>
+        <ul><li>До 5 подписок</li><li>Сумма в месяц и в год</li><li>Напоминания</li><li>Тёмная тема</li></ul>
+      </div>
+      <div class="plan pro reveal">
+        <h3>Pro</h3><div class="price">149 ₽</div><p>в месяц или 1 190 ₽ в год (−33%)</p>
+        <ul><li>Без ограничений</li><li>Советы по экономии</li><li>Экспорт в Excel (CSV)</li><li>Поддержка проекта</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <h2 class="reveal">Вопросы и ответы.</h2>
+    <div class="faq">
+      <details><summary>Subly подключается к моему банку?</summary><p>Нет. Подписки вы добавляете сами — это занимает несколько секунд. Subly не просит доступ к банку, картам или SMS и не видит ваших операций.</p></details>
+      <details><summary>Почему приложения нет в Google Play?</summary><p>Пока Subly распространяется как APK с GitHub: так быстрее выпускать обновления. Публикация в RuStore — в планах.</p></details>
+      <details><summary>Как оплатить Pro?</summary><p>В приложении: Профиль → Subly Pro. Оплата проходит в ЮKassa картой или через СБП. Данные карты Subly не получает.</p></details>
+      <details><summary>Pro продлевается автоматически?</summary><p>Нет. Вы платите один раз за месяц или год. Когда срок закончится, приложение вернётся к бесплатной версии, а данные сохранятся.</p></details>
+      <details><summary>Можно удалить аккаунт?</summary><p>Да, в профиле есть кнопка «Удалить аккаунт». Почта и все подписки удаляются с сервера сразу.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="alt final">
+  <div class="wrap">
+    <h2 class="reveal">Узнайте, сколько стоят<br>ваши подписки.</h2>
+    <div class="buttons reveal"><a class="btn primary" href="https://github.com/antonshkelll/subly/releases/latest/download/subly.apk">Скачать Subly</a></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Антон Шкель · <a href="https://antonshkel.ru">antonshkel.ru</a></span>
+    <span><a href="/privacy">Политика конфиденциальности</a> · <a href="https://github.com/antonshkelll/subly">GitHub</a> · <a href="https://t.me/antonshkelll">Telegram</a></span>
+  </div>
+</footer>
+
+<script>
+  // Появление блоков при прокрутке и «досчитывающаяся» сумма на телефоне.
+  (function () {
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var els = document.querySelectorAll(".reveal");
+    if (reduce || !("IntersectionObserver" in window)) { els.forEach(function (e) { e.classList.add("in"); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add("in");
+        if (en.target.id === "stage") count();
+        io.unobserve(en.target);
+      });
+    }, { threshold: 0.15 });
+    els.forEach(function (e) { io.observe(e); });
+
+    function count() {
+      var el = document.getElementById("counter"), target = 7211, t0 = performance.now(), dur = 1100;
+      function frame(t) {
+        var p = Math.min(1, (t - t0) / dur), v = Math.round(target * (1 - Math.pow(1 - p, 3)));
+        el.textContent = v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽";
+        if (p < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+  })();
+</script>
+</body>
+</html>

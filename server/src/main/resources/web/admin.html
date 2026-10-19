@@ -1,1 +1,186 @@
-{{PUBLIC_URL}}
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Subly · Админка</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<style>
+  :root { --bg: #f5f5f7; --card: #fff; --ink: #1d1d1f; --muted: #6e6e73; --line: #e5e5ea; --accent: #0071e3; --green: #248a3d; --red: #d70015; --fill: #ececf0; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #000; --card: #1c1c1e; --ink: #f5f5f7; --muted: #98989d; --line: #2c2c2e; --accent: #2997ff; --green: #30d158; --red: #ff453a; --fill: #2c2c2e; }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font: 15px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+  main { max-width: 1120px; margin: 0 auto; padding: 32px 18px 80px; }
+  h1 { font-size: 34px; letter-spacing: -0.02em; }
+  h2 { font-size: 20px; margin: 36px 0 12px; }
+  .muted { color: var(--muted); }
+  .card { background: var(--card); border-radius: 18px; padding: 20px; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-top: 24px; }
+  .kpi .v { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .kpi .t { color: var(--muted); font-size: 13px; }
+  .two { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+  @media (max-width: 800px) { .two { grid-template-columns: 1fr; } }
+  svg text { fill: var(--muted); font-size: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; color: var(--muted); font-weight: 500; font-size: 12px; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  td { padding: 10px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  tr:last-child td { border-bottom: none; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+  .tag.pro { background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent); }
+  .tag.free { background: var(--fill); color: var(--muted); }
+  .tag.succeeded { background: color-mix(in srgb, var(--green) 15%, transparent); color: var(--green); }
+  .tag.canceled { background: color-mix(in srgb, var(--red) 15%, transparent); color: var(--red); }
+  .tag.pending { background: var(--fill); color: var(--muted); }
+  input { font: inherit; color: var(--ink); background: var(--fill); border: none; border-radius: 10px; padding: 11px 14px; width: 100%; outline: none; }
+  input:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+  button { font: inherit; border: none; border-radius: 10px; padding: 10px 16px; cursor: pointer; background: var(--accent); color: #fff; font-weight: 500; }
+  button.link { background: none; color: var(--accent); padding: 4px 6px; }
+  button.danger { background: none; color: var(--red); padding: 4px 6px; }
+  #login { max-width: 360px; margin: 12vh auto 0; display: grid; gap: 12px; }
+  #login h1 { text-align: center; margin-bottom: 6px; }
+  .err { color: var(--red); font-size: 13px; min-height: 18px; }
+  .top { display: flex; align-items: center; gap: 12px; }
+  .top .sp { flex: 1; }
+  .scroll { overflow-x: auto; }
+  .bar { fill: var(--accent); }
+  .list li { list-style: none; display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .list li:last-child { border: none; }
+</style>
+</head>
+<body>
+<main>
+  <form id="login" class="card" hidden>
+    <h1>Subly</h1>
+    <p class="muted" style="text-align:center">Вход для администратора</p>
+    <input id="email" type="email" placeholder="Почта" autocomplete="username" required>
+    <input id="password" type="password" placeholder="Пароль" autocomplete="current-password" required>
+    <div class="err" id="loginErr"></div>
+    <button type="submit">Войти</button>
+    <p class="muted" style="font-size:12px;text-align:center">Доступ есть у адресов из ADMIN_EMAILS в настройках сервера.</p>
+  </form>
+
+  <div id="app" hidden>
+    <div class="top">
+      <h1>Админка</h1><span class="sp"></span>
+      <span class="muted" id="who"></span>
+      <button class="link" id="refresh">Обновить</button>
+      <button class="link" id="logout">Выйти</button>
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+
+    <div class="two">
+      <div><h2>Регистрации за 30 дней</h2><div class="card"><svg id="chart" width="100%" height="180" viewBox="0 0 600 180" preserveAspectRatio="none"></svg></div></div>
+      <div><h2>Популярные сервисы</h2><div class="card"><ul class="list" id="top"></ul></div></div>
+    </div>
+
+    <h2>Пользователи</h2>
+    <div class="card">
+      <input id="q" placeholder="Поиск по почте">
+      <div class="scroll"><table id="users"><thead><tr><th>ID</th><th>Почта</th><th>Тариф</th><th>Подписок</th><th>В месяц</th><th>Регистрация</th><th></th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <h2>Последние платежи</h2>
+    <div class="card scroll"><table id="payments"><thead><tr><th>ID</th><th>Пользователь</th><th>Тариф</th><th>Сумма</th><th>Статус</th><th>Дата</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</main>
+
+<script>
+(function () {
+  var token = sessionStorage.getItem("subly_admin");
+  var $ = function (id) { return document.getElementById(id); };
+  var rub = function (k) { return Math.round(k / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽"; };
+  var date = function (s) { return new Date(s).toLocaleDateString("ru-RU", { day: "numeric", month: "short", year: "numeric" }); };
+  var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
+
+  function api(path, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({ "Content-Type": "application/json" }, opts.headers || {}, token ? { Authorization: "Bearer " + token } : {});
+    return fetch(path, opts).then(function (r) {
+      if (r.status === 401 || r.status === 403) { logout(); throw new Error("Нет доступа"); }
+      if (!r.ok) return r.json().then(function (e) { throw new Error(e.message || r.status); });
+      return r.status === 204 ? null : r.json();
+    });
+  }
+
+  function show(loggedIn) { $("login").hidden = loggedIn; $("app").hidden = !loggedIn; }
+  function logout() { token = null; sessionStorage.removeItem("subly_admin"); show(false); }
+
+  $("login").addEventListener("submit", function (e) {
+    e.preventDefault();
+    $("loginErr").textContent = "";
+    fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: $("email").value, password: $("password").value }) })
+      .then(function (r) { return r.json().then(function (b) { if (!r.ok) throw new Error(b.message); return b; }); })
+      .then(function (b) {
+        if (!b.user.isAdmin) throw new Error("У этого аккаунта нет прав администратора");
+        token = b.token; sessionStorage.setItem("subly_admin", token); $("who").textContent = b.user.email; show(true); load();
+      })
+      .catch(function (err) { $("loginErr").textContent = err.message; });
+  });
+  $("logout").onclick = logout;
+  $("refresh").onclick = load;
+
+  function load() {
+    api("/api/admin/stats").then(renderStats).catch(function () {});
+    loadUsers();
+  }
+
+  function renderStats(s) {
+    var k = [
+      ["Пользователей", s.users, "+" + s.newUsers7d + " за 7 дней"],
+      ["Pro сейчас", s.proUsers, (s.conversionToPro * 100).toFixed(1).replace(".", ",") + "% конверсия"],
+      ["Выручка за 30 дней", rub(s.revenue30dKopecks), "всего " + rub(s.revenueTotalKopecks)],
+      ["Ведут подписки", s.activeTrackers, "из " + s.users + " зарегистрированных"],
+      ["Подписок в базе", s.subscriptionsTracked, s.avgSubscriptionsPerUser.toFixed(1).replace(".", ",") + " на человека"],
+      ["Средний чек подписок", rub(s.avgMonthlySpendKopecks), "в месяц на пользователя"],
+    ];
+    $("kpis").innerHTML = k.map(function (x) { return '<div class="card kpi"><div class="t">' + x[0] + '</div><div class="v">' + esc(x[1]) + '</div><div class="t">' + esc(x[2]) + "</div></div>"; }).join("");
+
+    var max = Math.max.apply(null, s.signups.map(function (d) { return d.count; }).concat([1]));
+    var w = 600 / s.signups.length;
+    $("chart").innerHTML = s.signups.map(function (d, i) {
+      var h = d.count / max * 150;
+      return '<rect class="bar" rx="3" x="' + (i * w + 2) + '" y="' + (160 - h) + '" width="' + (w - 4) + '" height="' + Math.max(h, 1) + '"><title>' + d.date + ": " + d.count + "</title></rect>" +
+        (i % 7 === 0 ? '<text x="' + (i * w + 2) + '" y="176">' + d.date.slice(5).split("-").reverse().join(".") + "</text>" : "");
+    }).join("");
+
+    $("top").innerHTML = s.topServices.length ? s.topServices.map(function (t) { return "<li><span>" + esc(t.name) + '</span><span class="muted">' + t.count + "</span></li>"; }).join("")
+      : '<li class="muted">Пока пусто</li>';
+
+    document.querySelector("#payments tbody").innerHTML = s.payments.map(function (p) {
+      return "<tr><td>" + p.id + "</td><td>" + p.userId + "</td><td>" + esc(p.plan) + "</td><td>" + rub(p.amountKopecks) + '</td><td><span class="tag ' + esc(p.status) + '">' + esc(p.status) + "</span></td><td>" + date(p.createdAt) + "</td></tr>";
+    }).join("") || '<tr><td colspan="6" class="muted">Платежей пока нет</td></tr>';
+  }
+
+  var timer;
+  $("q").addEventListener("input", function () { clearTimeout(timer); timer = setTimeout(loadUsers, 250); });
+
+  function loadUsers() {
+    api("/api/admin/users?q=" + encodeURIComponent($("q").value)).then(function (list) {
+      document.querySelector("#users tbody").innerHTML = list.map(function (u) {
+        return "<tr><td>" + u.id + "</td><td>" + esc(u.email) + '</td><td><span class="tag ' + u.plan + '">' + u.plan.toUpperCase() + "</span>" +
+          (u.proUntil && u.plan === "pro" ? ' <span class="muted">до ' + date(u.proUntil) + "</span>" : "") +
+          "</td><td>" + u.subscriptions + "</td><td>" + rub(u.monthlyKopecks) + "</td><td>" + date(u.createdAt) + "</td><td>" +
+          '<button class="link" data-pro="' + u.id + '">Pro на 30 дней</button>' +
+          (u.plan === "pro" ? '<button class="link" data-revoke="' + u.id + '">Снять Pro</button>' : "") +
+          '<button class="danger" data-del="' + u.id + '" data-email="' + esc(u.email) + '">Удалить</button></td></tr>';
+      }).join("") || '<tr><td colspan="7" class="muted">Никого не нашли</td></tr>';
+    }).catch(function () {});
+  }
+
+  document.querySelector("#users").addEventListener("click", function (e) {
+    var b = e.target;
+    if (b.dataset.pro) api("/api/admin/users/" + b.dataset.pro + "/pro", { method: "POST", body: JSON.stringify({ days: 30 }) }).then(load);
+    if (b.dataset.revoke) api("/api/admin/users/" + b.dataset.revoke + "/pro", { method: "POST", body: JSON.stringify({ days: 0 }) }).then(load);
+    if (b.dataset.del && confirm("Удалить " + b.dataset.email + " и все его данные?")) api("/api/admin/users/" + b.dataset.del, { method: "DELETE" }).then(load);
+  });
+
+  if (token) { show(true); load(); } else show(false);
+})();
+</script>
+</body>
+</html>

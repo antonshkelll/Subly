@@ -1,1 +1,7 @@
-{{PUBLIC_URL}}
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /billing/
+
+Sitemap: {{PUBLIC_URL}}/sitemap.xml
