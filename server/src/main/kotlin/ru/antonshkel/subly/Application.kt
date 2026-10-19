@@ -59,7 +59,9 @@ fun Application.module(
     if (cfg.jwtSecret == Config.DEV_SECRET) log.warn("JWT_SECRET не задан — используется тестовый ключ. Для сервера обязательно задайте свой.")
     log.info("Платежи: ${when { gateway != null -> "ЮKassa"; cfg.paymentsDemo -> "демо-режим"; else -> "выключены" }}")
 
-    install(XForwardedHeaders)          // за nginx: настоящий IP клиента для лимитов
+    // За nginx: берём последний адрес из X-Forwarded-For — его дописал сам nginx.
+    // Первый адрес присылает клиент, и подделав его, можно было бы обойти лимит на вход.
+    install(XForwardedHeaders) { useLastProxy() }
     install(DefaultHeaders) {
         header("X-Content-Type-Options", "nosniff")
         header("Referrer-Policy", "strict-origin-when-cross-origin")

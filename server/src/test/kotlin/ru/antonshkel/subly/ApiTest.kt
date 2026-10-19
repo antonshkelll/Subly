@@ -6,6 +6,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
@@ -213,6 +214,20 @@ class ApiTest {
         assertTrue("\"users\":2" in stats, stats)
         val users = c.get("/api/admin/users?q=user") { bearerAuth(admin.token) }.bodyAsText()
         assertTrue("user@example.com" in users)
+    }
+
+    @Test
+    fun `login rate limit cannot be bypassed with a forged X-Forwarded-For`() = testApplication {
+        application { module(cfg().copy(authRateLimit = 3), gateway = null) }
+        val c = json()
+        // Клиент подставляет разный «свой» IP, а nginx дописывает настоящий последним.
+        val codes = (1..5).map { i ->
+            c.post("/api/auth/login") {
+                header("X-Forwarded-For", "10.0.0.$i, 203.0.113.7")
+                contentType(ContentType.Application.Json); setBody(Credentials("x@example.com", "password123"))
+            }.status
+        }
+        assertEquals(HttpStatusCode.TooManyRequests, codes.last(), codes.toString())
     }
 
     @Test
