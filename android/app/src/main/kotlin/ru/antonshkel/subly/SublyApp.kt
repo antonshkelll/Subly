@@ -11,7 +11,7 @@ import ru.antonshkel.subly.data.Settings
 import ru.antonshkel.subly.work.ReminderWorker
 
 /** Простейший DI: все зависимости создаются один раз здесь. Для приложения такого размера Hilt не нужен. */
-class SublyApp : Application() {
+open class SublyApp : Application() {
     lateinit var settings: Settings
     lateinit var api: Api
     lateinit var repository: Repository

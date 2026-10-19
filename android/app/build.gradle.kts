@@ -116,6 +116,8 @@ dependencies {
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.robolectric:robolectric:4.14.1")
+    testImplementation("androidx.test:core-ktx:1.6.1")
+    testImplementation("androidx.work:work-testing:2.10.1")
     testImplementation("io.github.takahirom.roborazzi:roborazzi:1.43.0")
     testImplementation("io.github.takahirom.roborazzi:roborazzi-compose:1.43.0")
     testImplementation(composeBom)
