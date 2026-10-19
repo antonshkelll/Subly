@@ -42,6 +42,7 @@ import ru.antonshkel.subly.domain.fullDate
 import ru.antonshkel.subly.domain.next
 import ru.antonshkel.subly.domain.plural
 import ru.antonshkel.subly.domain.rub
+import ru.antonshkel.subly.domain.rubRound
 import ru.antonshkel.subly.domain.whenText
 import ru.antonshkel.subly.ui.components.AddButton
 import ru.antonshkel.subly.ui.components.AnimatedRub
@@ -168,7 +169,7 @@ private fun HeroCard(s: Summary) {
         AnimatedRub(s.monthly, Subly.type.hero, Color.White)
         Spacer(Modifier.height(14.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-            HeroStat("В год", rub(s.yearly))
+            HeroStat("В год", rubRound(s.yearly))
             HeroStat("Подписок", s.count.toString())
             HeroStat("За 30 дней", rub(s.next30))
         }

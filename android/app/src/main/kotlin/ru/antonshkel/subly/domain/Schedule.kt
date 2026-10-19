@@ -86,4 +86,7 @@ fun parseRub(text: String): Long? {
     return v.movePointRight(2).setScale(0, java.math.RoundingMode.HALF_UP).toLong()
 }
 
+/** Для итогов и пересчётов копейки — шум: «7 211 ₽» читается лучше, чем «7 211,17 ₽». */
+fun rubRound(kopecks: Long): String = rub(Math.round(kopecks / 100.0) * 100)
+
 fun kopecksToInput(k: Long): String = if (k % 100 == 0L) (k / 100).toString() else "%d,%02d".format(k / 100, k % 100)

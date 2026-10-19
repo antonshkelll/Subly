@@ -1,0 +1,44 @@
+# Subly на VPS: база PostgreSQL + сервер (готовый jar из GitHub Releases).
+# Ничего не собирается на сервере — подходит даже для VPS с 1 ГБ памяти.
+# Наружу ничего не открыто: сервер слушает только 127.0.0.1:8090, снаружи его отдаёт nginx.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: subly
+      POSTGRES_USER: subly
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U subly -d subly"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    image: eclipse-temurin:21-jre-alpine
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: jdbc:postgresql://db:5432/subly
+      DATABASE_USER: subly
+      PORT: "8080"
+      APP_ENV: prod
+    volumes:
+      - ./subly-server.jar:/app/subly-server.jar:ro
+    # 256 МБ хватает с запасом; сервер не займёт всю память VPS, где живут сайт и боты.
+    command: ["java", "-Xms64m", "-Xmx256m", "-XX:+UseSerialGC", "-jar", "/app/subly-server.jar"]
+    ports:
+      - "127.0.0.1:8090:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s

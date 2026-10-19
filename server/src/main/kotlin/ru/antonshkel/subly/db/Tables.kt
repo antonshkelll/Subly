@@ -51,6 +51,8 @@ object Payments : LongIdTable("payments") {
 fun connectDatabase(cfg: Config): Database {
     val ds = HikariDataSource(HikariConfig().apply {
         jdbcUrl = cfg.databaseUrl
+        // В fat jar реестр драйверов (META-INF/services) может потеряться — указываем класс явно.
+        driverClassName = if (cfg.databaseUrl.startsWith("jdbc:postgresql")) "org.postgresql.Driver" else "org.h2.Driver"
         if (cfg.databaseUser.isNotEmpty()) username = cfg.databaseUser
         if (cfg.databasePassword.isNotEmpty()) password = cfg.databasePassword
         maximumPoolSize = 5           // небольшой VPS: больше соединений не нужно

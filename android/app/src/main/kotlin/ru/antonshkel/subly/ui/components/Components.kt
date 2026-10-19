@@ -160,7 +160,7 @@ fun SecondaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modi
 fun AnimatedRub(kopecks: Long, style: TextStyle, color: Color = Subly.colors.label, modifier: Modifier = Modifier) {
     val anim = remember { Animatable(0f) }
     LaunchedEffect(kopecks) { anim.animateTo(kopecks.toFloat(), tween(700, easing = FastOutSlowInEasing)) }
-    val shown = if (anim.isRunning) (anim.value / 100).roundToLong() * 100 else kopecks
+    val shown = (if (anim.isRunning) anim.value / 100 else kopecks / 100f).roundToLong() * 100
     Text(rub(shown), style = style, color = color, modifier = modifier, maxLines = 1)
 }
 

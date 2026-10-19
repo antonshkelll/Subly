@@ -30,6 +30,7 @@ import ru.antonshkel.subly.data.User
 import ru.antonshkel.subly.domain.dayMonthShort
 import ru.antonshkel.subly.domain.next
 import ru.antonshkel.subly.domain.rub
+import ru.antonshkel.subly.domain.rubRound
 import ru.antonshkel.subly.ui.components.AddButton
 import ru.antonshkel.subly.ui.components.Avatar
 import ru.antonshkel.subly.ui.components.Badge
@@ -63,7 +64,7 @@ fun SubscriptionsScreen(
     }
     val last = sorted.lastIndex
     LazyColumn(Modifier.fillMaxSize(), contentPadding = contentPadding) {
-        item(key = "title") { LargeTitle("Подписки", subtitle = "${subs.size} · ${rub(subs.sumOf { it.monthlyKopecks })} в месяц") { AddButton(onAdd) } }
+        item(key = "title") { LargeTitle("Подписки", subtitle = "${subs.size} · ${rubRound(subs.sumOf { it.monthlyKopecks })} в месяц") { AddButton(onAdd) } }
         if (subs.isEmpty()) {
             item(key = "empty") {
                 Spacer(Modifier.height(24.dp))
@@ -116,7 +117,7 @@ fun SubscriptionRow(s: Subscription, today: LocalDate, onClick: () -> Unit) {
         Column(horizontalAlignment = Alignment.End) {
             Text(rub(s.priceKopecks), style = Subly.type.headline, color = Subly.colors.label)
             if (s.period != ru.antonshkel.subly.data.Period.MONTH)
-                Text("${rub(s.monthlyKopecks)}/мес", style = Subly.type.footnote, color = Subly.colors.secondary)
+                Text("${rubRound(s.monthlyKopecks)}/мес", style = Subly.type.footnote, color = Subly.colors.secondary)
         }
     }
 }

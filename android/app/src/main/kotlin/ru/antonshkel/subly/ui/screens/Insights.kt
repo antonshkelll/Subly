@@ -80,7 +80,7 @@ fun InsightsScreen(
                 Box(Modifier.fillMaxWidth().padding(48.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Subly.colors.accent) }
             }
             else -> {
-                val saving = insights.filter { it.kind == "duplicate" || it.kind == "trial" }.sumOf { it.savingKopecks ?: 0 }
+                val saving = potentialSaving(insights)
                 if (saving > 0) item(key = "saving") {
                     Spacer(Modifier.height(16.dp))
                     Card {
@@ -98,6 +98,19 @@ fun InsightsScreen(
             }
         }
     }
+}
+
+/**
+ * Сколько можно сэкономить. Один и тот же сервис может попасть в два совета
+ * (пробный период и дубль) — такие советы не складываем, берём больший.
+ */
+fun potentialSaving(insights: List<Insight>): Long {
+    val taken = mutableSetOf<Long>()
+    var total = 0L
+    insights.filter { (it.kind == "duplicate" || it.kind == "trial") && (it.savingKopecks ?: 0) > 0 }
+        .sortedByDescending { it.savingKopecks }
+        .forEach { if (it.subscriptionIds.none(taken::contains)) { total += it.savingKopecks!!; taken += it.subscriptionIds } }
+    return total
 }
 
 private data class Look(val icon: ImageVector, val color: @Composable () -> Color)

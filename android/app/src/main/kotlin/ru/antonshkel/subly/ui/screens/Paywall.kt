@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import ru.antonshkel.subly.data.Plan
 import ru.antonshkel.subly.data.PlansResponse
 import ru.antonshkel.subly.domain.rub
+import ru.antonshkel.subly.domain.rubRound
 import ru.antonshkel.subly.ui.components.Badge
 import ru.antonshkel.subly.ui.components.CloseButton
 import ru.antonshkel.subly.ui.components.PrimaryButton
@@ -152,11 +153,11 @@ private fun PlanCard(plan: Plan, selected: Boolean, monthlyPrice: Long?, onClick
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(if (plan.months == 1L) "Месяц" else "Год", style = Subly.type.headline, color = Subly.colors.label)
                 if (plan.months > 1 && monthlyPrice != null) {
-                    val discount = 100 - plan.priceKopecks * 100 / (monthlyPrice * plan.months)
+                    val discount = Math.round(100 - plan.priceKopecks * 100.0 / (monthlyPrice * plan.months))
                     if (discount > 0) { Spacer(Modifier.width(8.dp)); Badge("−$discount%", Subly.colors.green) }
                 }
             }
-            if (plan.months > 1) Text("${rub(plan.priceKopecks / plan.months)} в месяц", style = Subly.type.footnote, color = Subly.colors.secondary)
+            if (plan.months > 1) Text("${rubRound(plan.priceKopecks / plan.months)} в месяц", style = Subly.type.footnote, color = Subly.colors.secondary)
         }
         Text(rub(plan.priceKopecks), style = Subly.type.headline, color = Subly.colors.label)
     }

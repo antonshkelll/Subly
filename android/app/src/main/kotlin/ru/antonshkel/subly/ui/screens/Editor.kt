@@ -58,6 +58,7 @@ import ru.antonshkel.subly.domain.monthly
 import ru.antonshkel.subly.domain.parseRub
 import ru.antonshkel.subly.domain.plural
 import ru.antonshkel.subly.domain.rub
+import ru.antonshkel.subly.domain.rubRound
 import ru.antonshkel.subly.ui.components.Avatar
 import ru.antonshkel.subly.ui.components.Chip
 import ru.antonshkel.subly.ui.components.Divider
@@ -150,7 +151,7 @@ fun EditorScreen(
                 }
             }
             if (kopecks != null && p != Period.MONTH) {
-                Text("≈ ${rub(monthly(kopecks, p))} в месяц", style = Subly.type.footnote, color = Subly.colors.secondary,
+                Text("≈ ${rubRound(monthly(kopecks, p))} в месяц", style = Subly.type.footnote, color = Subly.colors.secondary,
                     modifier = Modifier.padding(start = 16.dp, top = 6.dp))
             }
 

@@ -62,3 +62,7 @@ ktor {
 tasks.test {
     testLogging { events("failed"); exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL }
 }
+
+tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+    mergeServiceFiles()
+}
