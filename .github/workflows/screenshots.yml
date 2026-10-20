@@ -26,8 +26,8 @@ jobs:
         run: ./gradlew recordRoborazziDebug --no-daemon
       - name: Commit
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "Anton Shkel"
+          git config user.email "236247991+antonshkelll@users.noreply.github.com"
           git add docs/screenshots
           git diff --cached --quiet && echo "Скриншоты не изменились" && exit 0
           git commit -m "Обновить скриншоты экранов"
