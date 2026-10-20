@@ -38,7 +38,10 @@ jobs:
         with:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && format('v{0}', inputs.version) || github.ref_name }}
           name: Subly ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
-          target_commitish: ${{ github.sha }}
+          # коммит задаём только при ручном выпуске: тег создаётся здесь же.
+          # При push тега релиз уже привязан к нему, и переносить его не нужно —
+          # иначе повторная отправка тега падает с «Resource not accessible by integration».
+          target_commitish: ${{ github.event_name == 'workflow_dispatch' && github.sha || '' }}
           files: |
             subly.apk
             subly-server.jar
