@@ -7,6 +7,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.response.header
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondRedirect
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -17,6 +18,9 @@ import ru.antonshkel.subly.db.Users
 import ru.antonshkel.subly.db.dbQuery
 
 @Serializable data class Health(val status: String, val db: Boolean)
+
+const val SOURCE_URL = "https://github.com/antonshkelll/Subly"
+const val APK_URL = "$SOURCE_URL/releases/latest/download/subly.apk"
 
 private fun resource(name: String) = Services::class.java.classLoader.getResource("web/$name")!!.readText()
 
@@ -38,6 +42,10 @@ fun Route.webRoutes(s: Services) {
     page("/privacy", "privacy.html", ContentType.Text.Html)
     page("/robots.txt", "robots.txt", ContentType.Text.Plain)
     page("/sitemap.xml", "sitemap.xml", ContentType.Application.Xml)
+
+    // Короткие ссылки на своём домене: их печатают в README, на лендинге и в приложении.
+    get("/download") { call.respondRedirect(APK_URL) }
+    get("/source") { call.respondRedirect(SOURCE_URL) }
 
     staticResources("/static", "web/static") {
         cacheControl { listOf(CacheControl.MaxAge(maxAgeSeconds = 7 * 86400)) }

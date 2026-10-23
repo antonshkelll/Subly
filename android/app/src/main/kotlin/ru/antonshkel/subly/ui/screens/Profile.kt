@@ -137,7 +137,7 @@ fun ProfileScreen(
             Group {
                 FormRow("Политика конфиденциальности", onClick = { onOpenUrl(prefs.serverUrl + "/privacy") }) { Chevron() }
                 Divider()
-                FormRow("Исходный код на GitHub", onClick = { onOpenUrl("https://github.com/antonshkelll/subly") }) { Chevron() }
+                FormRow("Исходный код на GitHub", onClick = { onOpenUrl(prefs.serverUrl + "/source") }) { Chevron() }
                 Divider()
                 FormRow("Версия") { Text(BuildConfig.VERSION_NAME, style = Subly.type.body, color = Subly.colors.secondary) }
             }

@@ -1,7 +1,7 @@
 <p align="center"><img src="docs/banner.png" alt="Subly — трекер подписок для Android" width="100%"></p>
 
 <p align="center">
-  <a href="https://github.com/antonshkelll/Subly/releases/latest/download/subly.apk"><b>Скачать APK</b></a> ·
+  <a href="https://subly.antonshkel.ru/download"><b>Скачать APK</b></a> ·
   <a href="https://subly.antonshkel.ru">Сайт</a> ·
   <a href="docs/DEPLOY.md">Развернуть свой сервер</a> ·
   <a href="docs/ROADMAP.md">План развития</a>
@@ -101,7 +101,7 @@ flowchart LR
 
 ### Скачать готовое приложение
 
-[subly.apk](https://github.com/antonshkelll/Subly/releases/latest/download/subly.apk) → открыть на телефоне → разрешить установку из этого источника. По умолчанию приложение работает с сервером `subly.antonshkel.ru`. Адрес меняется на экране входа («Сервер: …»).
+[subly.antonshkel.ru/download](https://subly.antonshkel.ru/download) → открыть на телефоне → разрешить установку из этого источника. По умолчанию приложение работает с сервером `subly.antonshkel.ru`. Адрес меняется на экране входа («Сервер: …»).
 
 ### Сервер у себя на компьютере
 

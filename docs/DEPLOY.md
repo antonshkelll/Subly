@@ -73,7 +73,7 @@ sudo bash deploy/setup.sh --ssl
 
 ## Шаг 5. Первый вход
 
-1. Установите APK на телефон: https://github.com/antonshkelll/Subly/releases/latest/download/subly.apk
+1. Установите APK на телефон: https://subly.antonshkel.ru/download (пока сервер не запущен, APK лежит в [релизах на GitHub](https://github.com/antonshkelll/Subly/releases/latest)).
 2. Зарегистрируйтесь на почту администратора.
 3. Откройте https://subly.antonshkel.ru/admin и войдите с той же почтой и паролем. Там видны пользователи, подписки, платежи и регистрации по дням.
 

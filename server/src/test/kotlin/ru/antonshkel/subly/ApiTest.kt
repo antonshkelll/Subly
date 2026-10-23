@@ -239,5 +239,11 @@ class ApiTest {
         assertEquals(HttpStatusCode.OK, c.get("/admin").status)
         assertNotNull(c.get("/sitemap.xml").bodyAsText().takeIf { "localhost" in it })
         assertEquals(HttpStatusCode.NotFound, c.get("/api/nope").status)
+
+        val noRedirect = createClient { followRedirects = false }
+        val apk = noRedirect.get("/download")
+        assertEquals(HttpStatusCode.Found, apk.status)
+        assertTrue(apk.headers["Location"]!!.endsWith("/releases/latest/download/subly.apk"))
+        assertEquals("https://github.com/antonshkelll/Subly", noRedirect.get("/source").headers["Location"])
     }
 }
