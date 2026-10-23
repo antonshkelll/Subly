@@ -40,6 +40,7 @@ import ru.antonshkel.subly.domain.dayMonthShort
 import ru.antonshkel.subly.domain.daysLeft
 import ru.antonshkel.subly.domain.fullDate
 import ru.antonshkel.subly.domain.next
+import ru.antonshkel.subly.domain.nextCharge
 import ru.antonshkel.subly.domain.plural
 import ru.antonshkel.subly.domain.rub
 import ru.antonshkel.subly.domain.rubRound
@@ -82,8 +83,21 @@ fun summarize(subs: List<Subscription>, today: LocalDate = LocalDate.now()): Sum
         categories = subs.groupBy { it.category }.mapValues { (_, l) -> l.sumOf { it.monthlyKopecks } }
             .entries.sortedByDescending { it.value }.map { it.key to it.value },
         upcoming = upcoming,
-        next30 = upcoming.sumOf { it.priceKopecks },
+        next30 = subs.sumOf { it.priceKopecks * it.chargesWithin(today, 30) },
     )
+}
+
+/** Сколько раз подписка спишется за ближайшие [days] дней: еженедельная за 30 дней списывается 4–5 раз. */
+private fun Subscription.chargesWithin(today: LocalDate, days: Long): Long {
+    val anchor = LocalDate.parse(anchorDate)
+    val end = today.plusDays(days)
+    var n = 0L
+    var d = next(today)
+    while (!d.isAfter(end)) {
+        n++
+        d = nextCharge(anchor, period, d.plusDays(1))
+    }
+    return n
 }
 
 /** Цвет категории на диаграмме — системные цвета iOS по порядку. */

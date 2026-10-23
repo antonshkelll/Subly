@@ -14,11 +14,13 @@ fun rub(kopecks: Long): String {
     return if (rest == 0L) "$grouped ₽" else "$grouped,${rest.toString().padStart(2, '0')} ₽"
 }
 
-private fun days(n: Long) = when {
-    n % 10 == 1L && n % 100 != 11L -> "$n день"
-    n % 10 in 2..4 && n % 100 !in 12..14 -> "$n дня"
-    else -> "$n дней"
+private fun plural(n: Long, one: String, few: String, many: String) = when {
+    n % 10 == 1L && n % 100 != 11L -> one
+    n % 10 in 2..4 && n % 100 !in 12..14 -> few
+    else -> many
 }
+
+private fun days(n: Long) = "$n ${plural(n, "день", "дня", "дней")}"
 
 /**
  * Советы по набору подписок. Только правила, без «магии»: каждый совет можно проверить руками,
@@ -31,14 +33,14 @@ fun buildInsights(subs: List<SubscriptionDto>, today: LocalDate): List<Insight> 
 
     out += Insight(
         kind = "total", title = "${rub(yearly)} в год",
-        text = "Столько стоят ваши ${subs.size} подписк${if (subs.size == 1) "а" else "и"}. Это ${rub(yearly / 365)} каждый день.",
+        text = "Столько стоят ваши ${subs.size} ${plural(subs.size.toLong(), "подписка", "подписки", "подписок")}. Это ${rub(yearly / 365)} каждый день.",
     )
 
     subs.filter { it.isTrial }.forEach { s ->
         val left = ChronoUnit.DAYS.between(today, LocalDate.parse(s.nextCharge))
         if (left in 0..7) out += Insight(
             kind = "trial", title = "Пробный период «${s.name}» скоро закончится",
-            text = "Через ${days(left)} (${LocalDate.parse(s.nextCharge).format(DAY)}) начнут списывать ${rub(s.priceKopecks)}. " +
+            text = "${if (left == 0L) "Сегодня" else "Через ${days(left)}"} (${LocalDate.parse(s.nextCharge).format(DAY)}) начнут списывать ${rub(s.priceKopecks)}. " +
                 "Если сервис не нужен, отмените подписку заранее.",
             savingKopecks = s.period.yearly(s.priceKopecks), subscriptionIds = listOf(s.id),
         )
@@ -47,7 +49,7 @@ fun buildInsights(subs: List<SubscriptionDto>, today: LocalDate): List<Insight> 
     subs.filter { it.category != "other" }.groupBy { it.category }.filterValues { it.size >= 2 }.forEach { (cat, group) ->
         val cheapest = group.minBy { it.period.yearly(it.priceKopecks) }
         out += Insight(
-            kind = "duplicate", title = "${group.size} сервиса в категории «${CATEGORIES[cat] ?: cat}»",
+            kind = "duplicate", title = "${group.size} ${plural(group.size.toLong(), "сервис", "сервиса", "сервисов")} в категории «${CATEGORIES[cat] ?: cat}»",
             text = "${group.joinToString(", ") { it.name }}. Если оставить один, сэкономите от ${rub(cheapest.period.yearly(cheapest.priceKopecks))} в год.",
             savingKopecks = cheapest.period.yearly(cheapest.priceKopecks), subscriptionIds = group.map { it.id },
         )

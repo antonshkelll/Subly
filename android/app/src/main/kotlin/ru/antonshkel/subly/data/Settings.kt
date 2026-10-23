@@ -56,7 +56,9 @@ class Settings(private val context: Context) {
     /** Ключи «подписка+дата», о которых уже напомнили: одно напоминание на одно списание. */
     suspend fun notified(): Set<String> = context.store.data.first()[K.notified] ?: emptySet()
     suspend fun addNotified(keys: Collection<String>) = context.store.edit {
-        // Храним только последние записи, чтобы набор не рос бесконечно.
-        it[K.notified] = ((it[K.notified] ?: emptySet()) + keys).toList().takeLast(200).toSet()
+        // Ключ — «id:дата списания». Записи о списаниях старше недели больше не нужны:
+        // так набор не растёт, а свежие напоминания не теряются.
+        val weekAgo = java.time.LocalDate.now().minusDays(7).toString()
+        it[K.notified] = ((it[K.notified] ?: emptySet()) + keys).filter { k -> k.substringAfter(':') >= weekAgo }.toSet()
     }
 }

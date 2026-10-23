@@ -59,6 +59,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     val effectFlow = effects.receiveAsFlow()
 
     private var messageJob: Job? = null
+    private var billingCheckAfterStart = false
 
     init {
         viewModelScope.launch {
@@ -75,6 +76,8 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
                 )
             }
             if (prefs.token != null) refresh(silent = true)
+            // Приложение открыли ссылкой subly://billing до того, как прочитались настройки.
+            if (billingCheckAfterStart) checkBilling(force = true)
         }
         viewModelScope.launch {
             repo.cache.collect { c -> _state.update { it.copy(user = c.user ?: it.user, subscriptions = c.subscriptions) } }
@@ -116,7 +119,8 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         settings.setToken(null)
         sublyApp.updateSession(null, _state.value.prefs.serverUrl)
         repo.clear()
-        _state.update { UiState(phase = Phase.AUTH, prefs = it.prefs.copy(token = null)) }
+        // message сохраняем: handle() и deleteAccount() показывают его сразу после вызова logout().
+        _state.update { UiState(phase = Phase.AUTH, prefs = it.prefs.copy(token = null), message = it.message) }
     }
 
     fun deleteAccount() = viewModelScope.launch {
@@ -204,6 +208,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     /** Пользователь вернулся из браузера (или по ссылке subly://billing) — проверяем оплату. */
     fun checkBilling(force: Boolean = false) {
         if (!force && !_state.value.checkoutPending) return
+        if (_state.value.phase == Phase.LOADING) { billingCheckAfterStart = true; return }
         if (_state.value.prefs.token == null) return
         viewModelScope.launch {
             try {
