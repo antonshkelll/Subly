@@ -109,13 +109,25 @@ flowchart LR
 
 Нужна Java 21. По умолчанию база хранится в файле H2 в `server/data`, так что PostgreSQL для разработки ставить не нужно.
 
+macOS и Linux:
+
 ```bash
 git clone https://github.com/antonshkelll/Subly.git
 cd Subly/server
-PAYMENTS_DEMO=true ADMIN_EMAILS=you@mail.ru ./gradlew run      # Windows: set PAYMENTS_DEMO=true && gradlew.bat run
+PAYMENTS_DEMO=true ADMIN_EMAILS=admin@example.com ./gradlew run
 ```
 
-- На http://localhost:8080 открывается лендинг, на http://localhost:8080/admin админка. Чтобы войти в админку, зарегистрируйте в приложении почту из `ADMIN_EMAILS`.
+Windows (PowerShell):
+
+```powershell
+git clone https://github.com/antonshkelll/Subly.git
+cd Subly\server
+$env:PAYMENTS_DEMO="true"; $env:ADMIN_EMAILS="admin@example.com"; .\gradlew.bat run
+```
+
+Вместо `admin@example.com` впишите свою почту: с ней вы войдёте в админку.
+
+- Когда в консоли появится `Responding at http://0.0.0.0:8080`, откройте в браузере `localhost:8080`: там лендинг, а на `localhost:8080/admin` админка. Чтобы войти в админку, зарегистрируйте в приложении почту из `ADMIN_EMAILS`.
 - `PAYMENTS_DEMO=true` включает Pro без оплаты, так удобно проверить все экраны. На боевом сервере этот режим запрещён.
 - Тесты запускаются командой `./gradlew test`. Они проверяют регистрацию, права доступа, лимиты, полный цикл оплаты с поддельной ЮKassa, советы и админку.
 
@@ -174,3 +186,4 @@ sudo bash deploy/setup.sh
 ## Лицензия
 
 MIT. Автор — [Антон Шкель](https://antonshkel.ru), Telegram [@antonshkelll](https://t.me/antonshkelll).
+

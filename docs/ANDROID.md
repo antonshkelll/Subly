@@ -35,9 +35,12 @@
 
 ```bash
 cd android
-./gradlew testDebugUnitTest        # unit-тесты и проверка, что все экраны рисуются
-./gradlew assembleRelease          # APK → app/build/outputs/apk/release/app-release.apk
-./gradlew recordRoborazziDebug     # перерисовать скриншоты в docs/screenshots
+# unit-тесты и проверка, что все экраны рисуются
+./gradlew testDebugUnitTest
+# APK → app/build/outputs/apk/release/app-release.apk
+./gradlew assembleRelease
+# перерисовать скриншоты в docs/screenshots
+./gradlew recordRoborazziDebug
 ```
 
 На Windows вместо `./gradlew` используйте `gradlew.bat`.
@@ -49,7 +52,8 @@ Release-сборка подписывается демо-ключом `keystore/
 Для публикации в магазине нужен свой ключ:
 
 ```bash
-keytool -genkeypair -v -keystore subly-release.jks -alias subly -keyalg RSA -keysize 2048 -validity 10000
+keytool -genkeypair -v -keystore subly-release.jks -alias subly \
+  -keyalg RSA -keysize 2048 -validity 10000
 ```
 
 Храните файл и пароли вне репозитория: если потерять ключ, выпускать обновления будет нельзя. Сборка с ним:
